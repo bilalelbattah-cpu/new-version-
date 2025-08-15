@@ -7,26 +7,35 @@ from datetime import date, datetime
 from io import BytesIO
 import os
 
-# File path for the Excel file
+Thought for 45spythonimport streamlit as st
+import pandas as pd
+from datetime import datetime, date
+import os
+
+# File path for the Excel file (only for Feuil2, categories are hardcoded)
 EXCEL_FILE = 'grocerie.xlsx'
 
-# Function to load categories from Feuil1
+# Hardcoded categories from Feuil1 to avoid reading issues
 @st.cache_data
 def load_categories():
-    df = pd.read_excel(EXCEL_FILE, sheet_name='Feuil1')
-    # Assuming columns: 'Catégorie', 'sous catégorie', 'Marché'
-    categories = {}
-    current_cat = None
-    for _, row in df.iterrows():
-        cat = row['Catégorie']
-        sub = row['sous catégorie']
-        if pd.notna(cat):
-            current_cat = cat
-            if current_cat not in categories:
-                categories[current_cat] = []
-        if pd.notna(sub) and current_cat:
-            categories[current_cat].append(sub)
-    # Add 'Autres' to each category if not present
+    categories = {
+        'Fruits': ['Banane', 'Mangue', 'Melon', 'Pastèque', 'Pêche', 'Nectarine', 'Orange', 'Avocado', 'Pomme', 'Autres'],
+        'Légumes': ['Pomme de terre', 'Tomate', 'Oignions', 'carotte', 'patate douce', 'concombre', 'Poivron', 'courgette', 'Aubergine', 'Persille', 'Menthe', 'ail', 'citronne', 'haricot vert', 'citrouille', 'choux', 'Laitues', 'Maïs', 'Autres'],
+        'Epices et sauces': ['Piment', 'Curcuma', 'Poivre', 'Gingembre', 'Cumin', 'Cannelle', 'Girofle', 'Thym', 'Laurier', 'Sels', 'Ketchup', 'Mayonnaise', 'Sauce Burger', 'Sauce Soja', 'Sauce Fromagères', 'Sauce tacos', 'Sauce Algériennes', 'Autres'],
+        'Légumineuse': ['Pois chiche', 'haricot', 'Lentille', 'riz', 'fève', 'petit pois', 'Autres'],
+        'Semoulerie': ['Les pates', 'semoules', 'Autres'],
+        'Boulangerie & pâtisserie': ['farines', 'Finot', 'Farine complet', 'levures chimique', 'Margarine', 'Eau de fleur', 'Cacao', 'aromes', 'sucre vanille', 'flan', 'chocolat', 'crèmes', 'amidon', 'crème fraiche', 'lait poudre', 'lait concentré', 'tacos/chawarma', 'Autres'],
+        'Fruits sec': ['Amande', 'noix', 'raisin sec', 'chia', 'cajou', 'pistache', 'pavot', 'cacahuète', 'Avoine', 'sésame', 'Autres'],
+        'Générale': ['Huile de table', 'Huile d\'olive', 'vinaigre', 'sucre', 'sucre brune', 'thé', 'café', 'Pains', 'Autres'],  # Added Autres
+        'Produit laitiers': ['Lait', 'Yogourt', 'Préparation fromage', 'Jus', 'Autres'],
+        'Petit déjeuner': ['Confiture', 'chocolat tartiner', 'Beurre', 'Fromage', 'Autres'],
+        'Boucherie': ['Viande', 'Viande hachée', 'Dinde', 'Poulet', 'Dinde fumé', 'Charcuterie', 'Autres'],
+        'poissonnerie': ['Sardines', 'Anchois', 'Crevettes', 'Calamar', 'Autres'],
+        'Nettoyage': ['Eau de javel', 'Lessive liquide', 'Lessive poudre', 'Savon vaisselle', 'désodoriseur', 'matériels nettoyage', 'Autres'],
+        'Hygiène': ['shampooing', 'savon', 'gel douche', 'rasoirs', 'déodorant', 'lingette', 'mouchoirs', 'couches', 'serviette', 'Gel nettoyant', 'dentifrice', 'brosse à dents', 'Papiers hygiénique', 'Gel intime', 'autres'],
+        'divers': ['Sac poubelles', 'Autres']
+    }
+    # Ensure 'Autres' is in each category
     for cat in categories:
         if 'Autres' not in categories[cat]:
             categories[cat].append('Autres')
